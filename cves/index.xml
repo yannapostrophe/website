@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cves on Yann&#39; === Yann Apostrophe</title>
+    <link>https://yannapostrophe.com/cves/</link>
+    <description>Recent content in Cves on Yann&#39; === Yann Apostrophe</description>
+    <generator>Hugo</generator>
+    <language>en-US</language>
+    <lastBuildDate>Fri, 03 Oct 2025 00:00:00 +0100</lastBuildDate>
+    <atom:link href="https://yannapostrophe.com/cves/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[Zabbix] User information disclosure</title>
+      <link>https://yannapostrophe.com/cves/cve-2025-27236/</link>
+      <pubDate>Fri, 03 Oct 2025 00:00:00 +0100</pubDate>
+      <guid>https://yannapostrophe.com/cves/cve-2025-27236/</guid>
+      <description>&lt;h2 id=&#34;the-bug-description&#34;&gt;&#xD;&#xA;  The bug description&#xD;&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#the-bug-description&#34;&gt;&#xD;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xD;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xD;&#xA;  &lt;/a&gt;&#xD;&#xA;&lt;/h2&gt;&#xD;&#xA;&lt;p&gt;CVE Record : &lt;a href=&#34;https://www.zabbix.com/security_advisories?query=CVE-2025-27236&#34;  class=&#34;external-link&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.zabbix.com/security_advisories?query=CVE-2025-27236&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;A regular Zabbix user can search other users in their user group via Zabbix API by select fields the user does not have access to view. This allows data-mining some field values the user does not have access to.&lt;/p&gt;&#xA;&lt;p&gt;In collab with &lt;strong&gt;ExoD&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>[CrushFTP] one clic to ATO</title>
+      <link>https://yannapostrophe.com/cves/cve-2024-40308/</link>
+      <pubDate>Tue, 23 Jul 2024 00:00:00 +0100</pubDate>
+      <guid>https://yannapostrophe.com/cves/cve-2024-40308/</guid>
+      <description>&lt;h2 id=&#34;the-bug-description&#34;&gt;&#xD;&#xA;  The bug description&#xD;&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#the-bug-description&#34;&gt;&#xD;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xD;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xD;&#xA;  &lt;/a&gt;&#xD;&#xA;&lt;/h2&gt;&#xD;&#xA;&lt;p&gt;CVE Record : &lt;a href=&#34;https://www.cve.org/CVERecord?id=CVE-2024-40308&#34;  class=&#34;external-link&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.cve.org/CVERecord?id=CVE-2024-40308&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;No dislosure at this time.&lt;/p&gt;&#xA;&lt;p&gt;In collab with &lt;strong&gt;SZD&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

